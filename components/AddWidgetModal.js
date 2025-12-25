@@ -12,6 +12,7 @@ export default function AddWidgetModal({ isOpen, onClose }) {
     const [selectedPath, setSelectedPath] = useState(''); 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [fieldLabel, setFieldLabel] = useState('');
 
     const handleTest = async () => {
         if(!apiEndpoint) return;
@@ -41,7 +42,6 @@ export default function AddWidgetModal({ isOpen, onClose }) {
                 <div className="pl-4 border-l-2 border-gray-100 ml-1">
                     {Object.keys(data).map((key) => {
                         const newPath = prefix ? `${prefix}-->${key}` : key;
-                        
                         return (
                         <div key={newPath} className="my-1">
                             <span className="font-mono text-xs text-purple-600 font-bold">{key}:</span>
@@ -56,7 +56,11 @@ export default function AddWidgetModal({ isOpen, onClose }) {
         return (
             <button
                 type="button"
-                onClick={() => setSelectedPath(prefix)}
+                onClick={() => {
+                    setSelectedPath(prefix);
+                    const parts = prefix.split('-->');
+                    setFieldLabel(parts[parts.length - 1]); 
+                }}
                 className={`ml-2 px-2 py-0.5 text-xs rounded border transition-colors
                 ${selectedPath === prefix 
                     ? 'bg-green-500 text-white border-green-600 shadow-sm' 
@@ -75,11 +79,13 @@ export default function AddWidgetModal({ isOpen, onClose }) {
             title,
             apiEndpoint,
             dataKey: selectedPath,
+            label: fieldLabel || "Value",
             initialData: previewData
         });
 
         setTitle('');
         setApiEndpoint('');
+        setFieldLabel('');
         setPreviewData(null);
         setSelectedPath('');
         onClose();
@@ -134,7 +140,7 @@ export default function AddWidgetModal({ isOpen, onClose }) {
                     </div>
 
                     {previewData && (
-                        <div className="border rounded-lg overflow-hidden">
+                        <div className="border rounded-lg overflow-hidden flex flex-col max-h-100">
                             <div className="bg-gray-50 p-2 border-b text-xs font-semibold text-gray-500 uppercase flex justify-between items-center">
                                 <span>Select a Data Field</span>
                                 {selectedPath && (
@@ -143,9 +149,29 @@ export default function AddWidgetModal({ isOpen, onClose }) {
                                 </span>
                                 )}
                             </div>
-                            <div className="p-4 bg-white overflow-auto max-h-60 font-mono text-sm">
+                            <div className="p-4 bg-white overflow-auto flex-1 font-mono text-sm">
                                 {renderJsonTree(previewData)}
                             </div>
+
+                            {selectedPath && (
+                                <div className="p-4 bg-blue-50 border-t border-blue-100 animate-in slide-in-from-bottom-2">
+                                    <label className="block text-xs font-bold text-blue-800 uppercase mb-1">
+                                        Label for Selected Field
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <input 
+                                            type="text" 
+                                            value={fieldLabel} 
+                                            onChange={(e) => setFieldLabel(e.target.value)}
+                                            className="flex-1 p-2 border border-blue-200 rounded text-sm outline-none focus:border-blue-500"
+                                            placeholder="e.g. Current Price"
+                                        />
+                                        <div className="text-xs text-gray-500 self-center">
+                                            Path: {selectedPath.split('-->').pop()}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

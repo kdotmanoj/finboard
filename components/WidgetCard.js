@@ -3,17 +3,11 @@ import { useState, useEffect } from 'react';
 import { Trash2, RefreshCw, TrendingUp } from 'lucide-react';
 import { getNestedValue } from '../utils/helpers';
 
-export default function WidgetCard({ id, title, apiEndpoint, dataKey, cachedData, onRemove }) {
+export default function WidgetCard({ id, title, apiEndpoint, dataKey, label, cachedData, onRemove }) {
     const [data, setData] = useState(cachedData || null);
     const [loading, setLoading] = useState(!cachedData);
     const [error, setError] = useState(null);
     
-    const getCleanLabel = (path) => {
-        if (!path) return "";
-        const parts = path.split('-->');
-        return parts[parts.length - 1];
-    };
-
     const fetchData = async () => {
         if (!data) setLoading(true);
         setError(null);
@@ -37,7 +31,7 @@ export default function WidgetCard({ id, title, apiEndpoint, dataKey, cachedData
     }, [apiEndpoint]); 
 
     const displayValue = data ? getNestedValue(data, dataKey) : null;
-    const cleanLabel = getCleanLabel(dataKey);
+    const finalLabel = label || dataKey;
 
     return (
         <div className="flex flex-col h-full bg-white p-5 relative group">
@@ -84,7 +78,7 @@ export default function WidgetCard({ id, title, apiEndpoint, dataKey, cachedData
                         
                         <div className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
                             <span className="bg-gray-100 px-2 py-0.5 rounded">
-                                {cleanLabel}
+                                {finalLabel}
                             </span>
                         </div>
                     </div>
