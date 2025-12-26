@@ -4,6 +4,7 @@ import useStore from '@/store/useStore';
 import WidgetCard from '@/components/WidgetCard';
 import AddWidgetModal from '@/components/AddWidgetModal';
 import TableWidget from '@/components/TableWidget';
+import ChartWidget from '@/components/ChartWidget';
 
 export default function Dashboard() {
   const { widgets, removeWidget } = useStore(); 
@@ -50,6 +51,8 @@ export default function Dashboard() {
                     {...widget}
                     onRemove={() => removeWidget(widget.id)}
                   />
+                ) : widget.type === 'chart' ? (
+                  <ChartWidget {...widget} onRemove={() => removeWidget(widget.id)} />
                 ) : (
                   <WidgetCard 
                     {...widget}

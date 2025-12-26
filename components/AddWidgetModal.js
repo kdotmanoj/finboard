@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { X, Check, List, CreditCard } from 'lucide-react';
+import { X, Check, List, CreditCard, LineChart } from 'lucide-react';
 import useStore from '../store/useStore';
 
 export default function AddWidgetModal({ isOpen, onClose }) {
@@ -69,7 +69,7 @@ export default function AddWidgetModal({ isOpen, onClose }) {
         return [];
     };
 
-    const availableColumns = displayType === 'table' ? getAvailableColumns() : [];
+    const availableColumns = (displayType === 'table' || displayType === 'chart') ? getAvailableColumns() : [];
 
     const renderJsonTree = (data, prefix = '') => {
         if(data === null) return <span className="text-gray-400 italic">null</span>;
@@ -81,7 +81,7 @@ export default function AddWidgetModal({ isOpen, onClose }) {
             return (
                 <div className="pl-4 border-l-2 border-gray-100 ml-1">
                      <div className="flex items-center gap-2 my-1">
-                        {displayType === 'table' && prefix !== '' && (
+                        {(displayType === 'table' || displayType === 'chart') && prefix !== '' && (
                             <button
                                 type="button"
                                 onClick={() => {
@@ -191,6 +191,12 @@ export default function AddWidgetModal({ isOpen, onClose }) {
                         >
                             <List size={16} /> Data Table
                         </button>
+                        <button 
+                            onClick={() => { setDisplayType('chart'); setSelectedPath(''); }}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${displayType === 'chart' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            <LineChart size={16} /> Graph
+                        </button>
                     </div>
 
                     <div className="space-y-4 mb-6">
@@ -230,7 +236,9 @@ export default function AddWidgetModal({ isOpen, onClose }) {
                     {previewData && (
                         <div className="border rounded-lg overflow-hidden flex flex-col max-h-100">
                             <div className="bg-gray-50 p-2 border-b text-xs font-semibold text-gray-500 uppercase flex justify-between items-center">
-                                <span>{displayType === 'card' ? 'Select a Value' : 'Select a List'}</span>
+                                <span>
+                                    {displayType === 'card' ? 'Select a Value' : 'Select a List'}
+                                </span>
                                 {selectedPath && (
                                 <span className="text-green-600 flex items-center gap-1 normal-case">
                                     <Check size={12} /> Selected
@@ -258,9 +266,11 @@ export default function AddWidgetModal({ isOpen, onClose }) {
                                 </div>
                             )}
 
-                            {displayType === 'table' && selectedPath && (
+                            {(displayType === 'table' || displayType === 'chart') && selectedPath && (
                                 <div className="p-4 bg-blue-50 border-t border-blue-100">
-                                    <label className="block text-xs font-bold text-blue-800 uppercase mb-2">Select Columns to Display</label>
+                                    <label className="block text-xs font-bold text-blue-800 uppercase mb-2">
+                                        {displayType === 'chart' ? 'Select Lines to Graph' : 'Select Columns to Display'}
+                                    </label>
                                     <div className="flex flex-wrap gap-2">
                                         {availableColumns.length > 0 ? availableColumns.map(col => (
                                             <button 
@@ -290,7 +300,7 @@ export default function AddWidgetModal({ isOpen, onClose }) {
                     </button>
                     <button 
                         onClick={handleSave}
-                        disabled={!selectedPath || !title || (displayType === 'table' && selectedColumns.length === 0)}
+                        disabled={!selectedPath || !title || (displayType !== 'card' && selectedColumns.length === 0)}
                         className="bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
                         Add Widget
