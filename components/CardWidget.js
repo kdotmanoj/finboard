@@ -6,18 +6,16 @@ import { getNestedValue } from '../utils/helpers';
 export default function CardWidget({ id, title, apiEndpoint, dataKey, label, cachedData, onRemove }) {
     const [data, setData] = useState(cachedData || null);
     const [loading, setLoading] = useState(!cachedData);
-    const [error, setError] = useState(null);
     
     const fetchData = async () => {
-        if (!data) setLoading(true);
-        setError(null);
+        setLoading(true);
         try {
             const res = await fetch(apiEndpoint);
-            if (!res.ok) throw new Error('Failed to fetch');
-            const result = await res.json();
-            setData(result);
+            if (!res.ok) throw new Error('Fetch Error');
+            const json = await res.json();
+            setData(json);
         } catch (err) {
-            setError('Update failed'); 
+            console.error(err); 
         } finally {
             setLoading(false);
         }
@@ -25,13 +23,12 @@ export default function CardWidget({ id, title, apiEndpoint, dataKey, label, cac
 
     useEffect(() => {
         if (!cachedData) fetchData();
-        
         const interval = setInterval(fetchData, 30000);
         return () => clearInterval(interval);
     }, [apiEndpoint]); 
 
     const displayValue = data ? getNestedValue(data, dataKey) : null;
-    const finalLabel = label || dataKey;
+    const isPrimitive = displayValue !== null && typeof displayValue !== 'object';
 
     return (
         <div className="flex flex-col h-full bg-white p-5 relative group">
@@ -48,40 +45,37 @@ export default function CardWidget({ id, title, apiEndpoint, dataKey, label, cac
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button 
                         onClick={fetchData} 
-                        className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition"
-                        title="Refresh"
+                        className="p-1.5 text-gray-400 hover:text-blue-600 rounded"
                     >
-                        <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+                        <RefreshCw size={14} className={loading ? "animate-spin" : ""}/>
                     </button>
                     <button 
                         onClick={onRemove} 
-                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition"
-                        title="Remove"
+                        className="p-1.5 text-gray-400 hover:text-red-600 rounded"
                     >
                         <Trash2 size={14} />
                     </button>
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-col justify-center">
-                {error && !data ? (
-                    <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded">
-                        Connection Error
-                    </div>
+            <div className="flex-1 flex flex-col justify-center text-center">
+                {loading && !data ? (
+                    <div className="animate-pulse h-8 bg-gray-100 rounded w-1/2 mx-auto"></div>
                 ) : (
-                    <div>
-                        <div className="text-3xl font-bold text-gray-900 tracking-tight mb-1">
-                            {displayValue !== undefined && displayValue !== null 
-                                ? displayValue.toLocaleString() 
-                                : <span className="text-gray-300">--</span>}
+                    <>
+                        <div className="text-3xl font-bold text-gray-900 tracking-tight overflow-hidden text-ellipsis">
+                            {isPrimitive ? (
+                                displayValue
+                            ) : (
+                                <span className="text-xs text-red-400 font-normal">
+                                    Error: Selected a List. Please delete and pick a Value.
+                                </span>
+                            )}
                         </div>
-                        
-                        <div className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            <span className="bg-gray-100 px-2 py-0.5 rounded">
-                                {finalLabel}
-                            </span>
+                        <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mt-1">
+                            {label || "Value"}
                         </div>
-                    </div>
+                    </>
                 )}
             </div>
         </div>

@@ -1,22 +1,22 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Trash2, RefreshCw, Table as TableIcon } from 'lucide-react';
+import { Trash2, RefreshCw, Table as TableIcon, Search } from 'lucide-react';
 
 export default function TableWidget({ id, title, apiEndpoint, dataKey, columns = [], cachedData, onRemove }) {
     const [data, setData] = useState(cachedData || null);
     const [loading, setLoading] = useState(!cachedData);
     const [error, setError] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const fetchData = async () => {
         setLoading(true);
         setError(null);
-        
         try {
             const res = await fetch(apiEndpoint);
             const json = await res.json();
             setData(json);
         } catch (err) {
-            setError('Failed to load ddata');
+            setError('Failed to load data');
         } finally {
             setLoading(false);
         }
@@ -54,18 +54,40 @@ export default function TableWidget({ id, title, apiEndpoint, dataKey, columns =
 
     const rows = getTableData();
 
+    const filteredRows = rows.filter(row => {
+        if (!searchTerm) return true;
+        const lowerTerm = searchTerm.toLowerCase();
+        return (
+            (row.key_name && String(row.key_name).toLowerCase().includes(lowerTerm)) || 
+            columns.some(col => String(row[col]).toLowerCase().includes(lowerTerm))
+        );
+    });
+
     return (
         <div className="flex flex-col h-full bg-white p-4 relative group">
-            <div className="flex justify-between items-center mb-4 drag-handle cursor-move">
-                <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
-                        <TableIcon size={16} />
+            <div className="flex flex-col gap-3 mb-3">
+                <div className="flex justify-between items-center drag-handle cursor-move">
+                    <div className="flex items-center gap-2">
+                        <div className="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
+                            <TableIcon size={16} />
+                        </div>
+                        <h3 className="font-semibold text-gray-700 truncate" title={title}>{title}</h3>
                     </div>
-                    <h3 className="font-semibold text-gray-700 truncate" title={title}>{title}</h3>
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={fetchData} className="p-1.5 text-gray-400 hover:text-blue-600 rounded"><RefreshCw size={14}/></button>
+                        <button onClick={onRemove} className="p-1.5 text-gray-400 hover:text-red-600 rounded"><Trash2 size={14}/></button>
+                    </div>
                 </div>
-                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={fetchData} className="p-1.5 text-gray-400 hover:text-blue-600 rounded"><RefreshCw size={14}/></button>
-                    <button onClick={onRemove} className="p-1.5 text-gray-400 hover:text-red-600 rounded"><Trash2 size={14}/></button>
+
+                <div className="relative">
+                    <Search size={14} className="absolute left-2.5 top-2 text-gray-400" />
+                    <input 
+                        type="text" 
+                        placeholder="Search table..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-200 rounded-md focus:border-purple-500 outline-none bg-gray-50 focus:bg-white transition-colors"
+                    />
                 </div>
             </div>
 
@@ -88,7 +110,7 @@ export default function TableWidget({ id, title, apiEndpoint, dataKey, columns =
                         </tr>
                         </thead>
                         <tbody>
-                        {rows.length > 0 ? rows.map((row, idx) => (
+                        {filteredRows.length > 0 ? filteredRows.map((row, idx) => (
                             <tr key={idx} className="border-b hover:bg-gray-50 transition-colors">
                             <td className="p-2 font-medium text-gray-600 whitespace-nowrap">{row.key_name || idx}</td>
                             {columns.map(col => (
@@ -98,7 +120,9 @@ export default function TableWidget({ id, title, apiEndpoint, dataKey, columns =
                             ))}
                             </tr>
                         )) : (
-                            <tr><td colSpan={columns.length + 1} className="p-4 text-center text-gray-400">No Data Found</td></tr>
+                            <tr><td colSpan={columns.length + 1} className="p-4 text-center text-gray-400">
+                                {rows.length === 0 ? "No Data Found" : `No results for "${searchTerm}"`}
+                            </td></tr>
                         )}
                         </tbody>
                     </table>
