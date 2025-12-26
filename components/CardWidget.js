@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Trash2, RefreshCw, TrendingUp } from 'lucide-react';
 import { getNestedValue } from '../utils/helpers';
 
-export default function WidgetCard({ id, title, apiEndpoint, dataKey, label, cachedData, onRemove }) {
+export default function CardWidget({ id, title, apiEndpoint, dataKey, label, cachedData, onRemove }) {
     const [data, setData] = useState(cachedData || null);
     const [loading, setLoading] = useState(!cachedData);
     const [error, setError] = useState(null);
@@ -40,7 +40,7 @@ export default function WidgetCard({ id, title, apiEndpoint, dataKey, label, cac
                     <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
                         <TrendingUp size={16} />
                     </div>
-                    <h3 className="font-semibold text-gray-700 truncate max-w-[120px]" title={title}>
+                    <h3 className="font-semibold text-gray-700 truncate max-w-30" title={title}>
                         {title}
                     </h3>
                 </div>

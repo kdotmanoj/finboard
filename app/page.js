@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import useStore from '@/store/useStore';
-import WidgetCard from '@/components/WidgetCard';
+import CardWidget from '@/components/CardWidget';
 import AddWidgetModal from '@/components/AddWidgetModal';
 import TableWidget from '@/components/TableWidget';
 import ChartWidget from '@/components/ChartWidget';
@@ -54,7 +54,7 @@ export default function Dashboard() {
                 ) : widget.type === 'chart' ? (
                   <ChartWidget {...widget} onRemove={() => removeWidget(widget.id)} />
                 ) : (
-                  <WidgetCard 
+                  <CardWidget 
                     {...widget}
                     onRemove={() => removeWidget(widget.id)}
                   />
