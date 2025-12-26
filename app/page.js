@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import useStore from '@/store/useStore';
 import WidgetCard from '@/components/WidgetCard';
 import AddWidgetModal from '@/components/AddWidgetModal';
+import TableWidget from '@/components/TableWidget';
 
 export default function Dashboard() {
   const { widgets, removeWidget } = useStore(); 
@@ -43,11 +44,18 @@ export default function Dashboard() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {widgets.map((widget) => (
-              <div key={widget.id} className="h-60 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                <WidgetCard 
-                  {...widget} 
-                  onRemove={() => removeWidget(widget.id)}
-                />
+              <div key={widget.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                {widget.type === 'table' ? (
+                  <TableWidget 
+                    {...widget}
+                    onRemove={() => removeWidget(widget.id)}
+                  />
+                ) : (
+                  <WidgetCard 
+                    {...widget}
+                    onRemove={() => removeWidget(widget.id)}
+                  />
+                )}
               </div>
             ))}
           </div>
