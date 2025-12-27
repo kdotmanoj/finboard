@@ -25,6 +25,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
   const [selectedPath, setSelectedPath] = useState(null);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [dataFormat, setDataFormat] = useState('raw');
 
   useEffect(() => {
     if (isOpen && editWidgetId) {
@@ -37,6 +38,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
         setSelectedPath(widgetToEdit.dataKey !== undefined ? widgetToEdit.dataKey : null);
         setSelectedColumns(widgetToEdit.columns || []);
         setPreviewData(widgetToEdit.initialData || null);
+        setDataFormat(widgetToEdit.dataFormat || 'raw');
       }
     } else if (isOpen && !editWidgetId) {
       setTitle("");
@@ -45,6 +47,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
       setCardFields([]);
       setSelectedPath(null);
       setSelectedColumns([]);
+      setDataFormat('raw');
     }
   }, [isOpen, editWidgetId, widgets]);
 
@@ -260,6 +263,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
       cardFields: displayType === "card" ? cardFields : [],
       dataKey: selectedPath,
       columns: selectedColumns,
+      dataFormat: displayType === 'card' ? dataFormat : 'raw',
     };
 
     if (editWidgetId) {
@@ -313,6 +317,20 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
               placeholder="Widget Title"
               className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <div className="flex gap-2">
+                {displayType === 'card' && (
+                    <select 
+                        value={dataFormat} 
+                        onChange={(e) => setDataFormat(e.target.value)}
+                        className="p-2 border rounded-lg bg-white text-sm outline-none focus:ring-2 focus:ring-blue-500 text-gray-600"
+                    >
+                        <option value="raw">No Format</option>
+                        <option value="currency">Currency ($)</option>
+                        <option value="percentage">Percentage (%)</option>
+                        <option value="number">Number (1,000.00)</option>
+                    </select>
+                )}
+            </div>
             <div className="flex gap-2">
               <input
                 type="text"

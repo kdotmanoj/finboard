@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Trash2, RefreshCw, TrendingUp } from "lucide-react";
+import { formatValue } from "@/utils/formatter";
 
 export default function CardWidget({
   id,
@@ -9,6 +10,7 @@ export default function CardWidget({
   cardFields = [],
   cachedData,
   onRemove,
+  dataFormat = 'raw'
 }) {
   const [data, setData] = useState(cachedData || null);
   const [loading, setLoading] = useState(!cachedData);
@@ -90,7 +92,7 @@ export default function CardWidget({
                   {field.label}
                 </span>
                 <span className="text-sm font-bold text-gray-900 font-mono">
-                  {String(getValueFromPath(field.path))}
+                  {formatValue(getValueFromPath(field.path), dataFormat)}
                 </span>
               </div>
             ))}
