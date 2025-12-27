@@ -37,16 +37,16 @@ export default function TableWidget({
   }, [apiEndpoint]);
 
   const getTableData = () => {
-    if (!data || !dataKey) return [];
+    if (!data ) return [];
 
     const parts = dataKey.split("-->");
     let current = data;
-    for (const part of parts) {
-      if (current && current[part]) {
-        current = current[part];
-      } else {
-        return [];
-      }
+    if (dataKey) {
+        const parts = dataKey.split('-->');
+        for(const part of parts){
+            if(current && current[part]) current = current[part];
+            else return [];
+        }
     }
 
     if (Array.isArray(current)) {

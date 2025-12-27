@@ -1,18 +1,17 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   X,
   Check,
   List,
   CreditCard,
   LineChart,
-  Plus,
   Trash2,
 } from "lucide-react";
 import useStore from "../store/useStore";
 
-export default function AddWidgetModal({ isOpen, onClose }) {
-  const addWidget = useStore((state) => state.addWidget);
+export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null }) {
+  const { widgets, addWidget, updateWidget } = useStore();
 
   const [displayType, setDisplayType] = useState("card");
   const [title, setTitle] = useState("");
@@ -23,19 +22,40 @@ export default function AddWidgetModal({ isOpen, onClose }) {
 
   const [cardFields, setCardFields] = useState([]);
 
-  const [selectedPath, setSelectedPath] = useState("");
+  const [selectedPath, setSelectedPath] = useState(null);
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    if (isOpen && editWidgetId) {
+      const widgetToEdit = widgets.find((w) => w.id === editWidgetId);
+      if (widgetToEdit) {
+        setTitle(widgetToEdit.title);
+        setApiEndpoint(widgetToEdit.apiEndpoint);
+        setDisplayType(widgetToEdit.type);
+        setCardFields(widgetToEdit.cardFields || []);
+        setSelectedPath(widgetToEdit.dataKey !== undefined ? widgetToEdit.dataKey : null);
+        setSelectedColumns(widgetToEdit.columns || []);
+        setPreviewData(widgetToEdit.initialData || null);
+      }
+    } else if (isOpen && !editWidgetId) {
+      setTitle("");
+      setApiEndpoint("");
+      setPreviewData(null);
+      setCardFields([]);
+      setSelectedPath(null);
+      setSelectedColumns([]);
+    }
+  }, [isOpen, editWidgetId, widgets]);
 
   const handleTest = async () => {
     if (!apiEndpoint) return;
     setLoading(true);
     setError(null);
     setPreviewData(null);
-    setCardFields([]);
-    setSelectedPath("");
+    setSelectedPath(null); 
     setSelectedColumns([]);
-
+    
     try {
       const res = await fetch(apiEndpoint);
       if (!res.ok) throw new Error("Failed to fetch");
@@ -74,14 +94,14 @@ export default function AddWidgetModal({ isOpen, onClose }) {
   };
 
   const getAvailableColumns = () => {
-    if (!previewData || !selectedPath) return [];
-    const parts = selectedPath.split("-->");
+    if (!previewData || selectedPath === null) return [];
+    
     let current = previewData;
-    for (const part of parts) {
-      if (current && current[part] !== undefined) {
-        current = current[part];
-      } else {
-        return [];
+    if (selectedPath) {
+      const parts = selectedPath.split("-->");
+      for (const part of parts) {
+        if (current && current[part] !== undefined) current = current[part];
+        else return [];
       }
     }
     if (typeof current === "object" && current !== null) {
@@ -106,55 +126,102 @@ export default function AddWidgetModal({ isOpen, onClose }) {
   const renderJsonTree = (data, prefix = "") => {
     if (data === null)
       return <span className="text-gray-400 italic">null</span>;
+
     const isObject = typeof data === "object";
+    const isArray = Array.isArray(data);
     const isSelectedContainer = selectedPath === prefix;
 
-    if (isObject) {
-      return (
-        <div className="pl-4 border-l-2 border-gray-100 ml-1">
-          <div className="flex items-center gap-2 my-1">
-            {displayType !== "card" && prefix !== "" && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedPath(prefix);
-                  setSelectedColumns([]);
-                  setSearchQuery("");
-                }}
-                className={`px-2 py-0.5 text-xs rounded border transition-colors flex items-center gap-1
-                                ${
-                                  isSelectedContainer
-                                    ? "bg-blue-600 text-white border-blue-700 shadow-sm"
-                                    : "bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200"
-                                }`}
-              >
-                {isSelectedContainer && <Check size={10} />} Select List
-              </button>
-            )}
-            {prefix && (
-              <span className="font-mono text-xs text-purple-600 font-bold">
-                {prefix.split("-->").pop()}:
-              </span>
-            )}
-          </div>
+    let isValidList = false;
+    if (isArray) {
+      isValidList = true;
+    } else if (isObject) {
+      const keys = Object.keys(data);
+      if (
+        keys.length > 0 &&
+        typeof data[keys[0]] === "object" &&
+        data[keys[0]] !== null
+      ) {
+        isValidList = true;
+      }
+    }
 
-          {Array.isArray(data)
-            ? data
-                .slice(0, 3)
-                .map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="my-1 text-xs text-gray-400"
-                  >{`[Item ${idx}]`}</div>
-                ))
-            : Object.keys(data).map((key) => (
-                <div key={key}>
-                  {renderJsonTree(
-                    data[key],
-                    prefix ? `${prefix}-->${key}` : key,
-                  )}
+    if (isObject) {
+      const containerHeader = (
+        <div className="flex items-center gap-2 my-1">
+          {displayType !== "card" && isValidList && (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedPath(prefix);
+                setSelectedColumns([]);
+                setSearchQuery("");
+              }}
+              className={`px-2 py-0.5 text-xs rounded border transition-colors flex items-center gap-1
+                    ${
+                      isSelectedContainer
+                        ? "bg-blue-600 text-white border-blue-700 shadow-sm"
+                        : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600"
+                    }`}
+            >
+              {isSelectedContainer && <Check size={10} />}
+              {prefix === ""
+                ? isArray
+                  ? "Select Main List"
+                  : "Select Root Data"
+                : isArray
+                  ? "Select List"
+                  : "Select Folder"}
+            </button>
+          )}
+
+          {prefix && (
+            <span
+              className={`font-mono text-xs font-bold ${displayType !== "card" && isValidList ? "text-purple-700" : "text-gray-400"}`}
+            >
+              {prefix.split("-->").pop()}:
+            </span>
+          )}
+
+          {isArray && (
+            <span className="text-[10px] text-gray-400 bg-gray-50 px-1 rounded border">
+              {data.length} items
+            </span>
+          )}
+        </div>
+      );
+
+      let childrenContent;
+      if (isArray) {
+        if (data.length > 0) {
+          childrenContent = (
+            <div>
+              {renderJsonTree(data[0], `${prefix}${prefix ? "-->" : ""}0`)}
+              {data.length > 1 && (
+                <div className="text-[10px] text-gray-400 italic mt-1 ml-2">
+                  ... and {data.length - 1} more
                 </div>
-              ))}
+              )}
+            </div>
+          );
+        } else {
+          childrenContent = (
+            <div className="text-gray-400 italic text-xs ml-2">(Empty)</div>
+          );
+        }
+      } else {
+        childrenContent = Object.keys(data).map((key) => (
+          <div key={key}>
+            {renderJsonTree(data[key], prefix ? `${prefix}-->${key}` : key)}
+          </div>
+        ));
+      }
+
+      return (
+        <div
+          className={`pl-2 ml-1 ${prefix !== "" ? "border-l-2 border-gray-100" : ""}`}
+        >
+          {containerHeader}
+          <div className="pl-2">{childrenContent}</div>
         </div>
       );
     }
@@ -166,27 +233,26 @@ export default function AddWidgetModal({ isOpen, onClose }) {
           type="button"
           onClick={() => addCardField(prefix, prefix.split("-->").pop())}
           disabled={isSelected}
-          className={`ml-2 px-2 py-0.5 text-xs rounded border transition-colors flex items-center gap-1
-                    ${isSelected ? "bg-green-100 text-green-700 border-green-200 cursor-default" : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-200"}`}
+          className={`ml-2 my-0.5 px-2 py-0.5 text-xs rounded border transition-colors inline-flex items-center gap-1
+                    ${
+                      isSelected
+                        ? "bg-green-100 text-green-700 border-green-200 cursor-default"
+                        : "bg-white text-gray-700 border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300"
+                    }`}
         >
           {isSelected && <Check size={10} />} {String(data)}
         </button>
       );
     }
-    return <span className="ml-2 text-gray-600 text-xs">{String(data)}</span>;
+    return (
+      <span className="ml-2 text-gray-400 text-xs select-none">
+        {String(data)}
+      </span>
+    );
   };
 
   const handleSave = () => {
-    if (!title || !apiEndpoint) return;
-
-    if (displayType === "card" && cardFields.length === 0) return;
-    if (
-      displayType !== "card" &&
-      (!selectedPath || selectedColumns.length === 0)
-    )
-      return;
-
-    addWidget({
+    const config = {
       title,
       apiEndpoint,
       type: displayType,
@@ -194,14 +260,13 @@ export default function AddWidgetModal({ isOpen, onClose }) {
       cardFields: displayType === "card" ? cardFields : [],
       dataKey: selectedPath,
       columns: selectedColumns,
-    });
+    };
 
-    setTitle("");
-    setApiEndpoint("");
-    setPreviewData(null);
-    setCardFields([]);
-    setSelectedPath("");
-    setSelectedColumns([]);
+    if (editWidgetId) {
+      updateWidget(editWidgetId, config);
+    } else {
+      addWidget(config);
+    }
     onClose();
   };
 
@@ -212,7 +277,7 @@ export default function AddWidgetModal({ isOpen, onClose }) {
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
         <div className="p-4 border-b flex justify-between items-center bg-gray-50">
           <h2 className="font-bold text-lg text-gray-800">
-            Configure New Widget
+            {editWidgetId ? "Edit Widget" : "Configure New Widget"}
           </h2>
           <button
             onClick={onClose}
@@ -319,7 +384,7 @@ export default function AddWidgetModal({ isOpen, onClose }) {
               )}
 
               {(displayType === "table" || displayType === "chart") &&
-                selectedPath && (
+                selectedPath !== null && (
                   <div className="p-4 bg-blue-50">
                     <div className="flex justify-between items-end mb-2">
                       <label className="block text-xs font-bold text-blue-800 uppercase">
@@ -359,11 +424,11 @@ export default function AddWidgetModal({ isOpen, onClose }) {
               !title ||
               (displayType === "card"
                 ? cardFields.length === 0
-                : !selectedPath || selectedColumns.length === 0)
+                : !selectedPath && selectedPath !== "" || selectedColumns.length === 0)
             }
             className="bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50"
           >
-            Add Widget
+            {editWidgetId ? "Save Changes" : "Add Widget"}
           </button>
         </div>
       </div>
