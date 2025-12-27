@@ -1,6 +1,6 @@
 "use client";
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export function SortableItem({ id, children }) {
   const {
@@ -9,13 +9,13 @@ export function SortableItem({ id, children }) {
     setNodeRef,
     transform,
     transition,
-    isDragging
+    isDragging,
   } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isDragging ? 50 : 'auto', 
+    zIndex: isDragging ? 50 : "auto",
     opacity: isDragging ? 0.8 : 1,
   };
 
