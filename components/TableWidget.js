@@ -1,6 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Trash2, RefreshCw, Table as TableIcon, Search } from "lucide-react";
+import {
+  Trash2,
+  RefreshCw,
+  Table as TableIcon,
+  Search,
+  Edit2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { formatValue } from "../utils/formatter";
 
 export default function TableWidget({
   id,
@@ -8,13 +17,18 @@ export default function TableWidget({
   apiEndpoint,
   dataKey,
   columns = [],
+  dataFormat,
   cachedData,
   onRemove,
+  onEdit,
 }) {
   const [data, setData] = useState(cachedData || null);
   const [loading, setLoading] = useState(!cachedData);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const ROWS_PER_PAGE = 10;
 
   const fetchData = async () => {
     setLoading(true);
@@ -22,9 +36,10 @@ export default function TableWidget({
     try {
       const res = await fetch(apiEndpoint);
       const json = await res.json();
+      if (json.Note || json.Information) throw new Error("API Limit Reached");
       setData(json);
     } catch (err) {
-      setError("Failed to load data");
+      setError(err.message || "Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -36,24 +51,27 @@ export default function TableWidget({
     return () => clearInterval(interval);
   }, [apiEndpoint]);
 
-  const getTableData = () => {
-    if (!data ) return [];
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
-    const parts = dataKey.split("-->");
+  const getTableData = () => {
+    if (!data) return [];
+
     let current = data;
     if (dataKey) {
-        const parts = dataKey.split('-->');
-        for(const part of parts){
-            if(current && current[part]) current = current[part];
-            else return [];
-        }
+      const parts = dataKey.split("-->");
+      for (const part of parts) {
+        if (current && current[part]) current = current[part];
+        else return [];
+      }
     }
 
     if (Array.isArray(current)) {
       return current;
     } else if (typeof current === "object") {
       return Object.keys(current)
-        .slice(0, 10)
+        .slice(0, 100)
         .map((key) => ({
           key_name: key,
           ...current[key],
@@ -74,6 +92,12 @@ export default function TableWidget({
     );
   });
 
+  const totalPages = Math.ceil(filteredRows.length / ROWS_PER_PAGE);
+  const paginatedRows = filteredRows.slice(
+    (currentPage - 1) * ROWS_PER_PAGE,
+    currentPage * ROWS_PER_PAGE,
+  );
+
   return (
     <div className="flex flex-col h-full bg-white p-4 relative group">
       <div className="flex flex-col gap-3 mb-3">
@@ -91,7 +115,14 @@ export default function TableWidget({
               onClick={fetchData}
               className="p-1.5 text-gray-400 hover:text-blue-600 rounded"
             >
-              <RefreshCw size={14} />
+              <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+            </button>
+            <button
+              onClick={onEdit}
+              className="p-1.5 text-gray-400 hover:text-green-600 rounded"
+              title="Edit"
+            >
+              <Edit2 size={15} />
             </button>
             <button
               onClick={onRemove}
@@ -116,11 +147,12 @@ export default function TableWidget({
 
       <div className="flex-1 overflow-auto border rounded-lg scrollbar-thin">
         {error ? (
-          <div className="h-full flex flex-col items-center justify-center text-red-500 text-xs p-4 text-center">
-            <p className="font-semibold mb-1">Connection Error</p>
+          <div className="h-full flex flex-col items-center justify-center text-red-500 text-xs p-4 text-center bg-red-50 rounded">
+            <p className="font-bold mb-1">API Error</p>
+            <p>{error}</p>
             <button
               onClick={fetchData}
-              className="text-blue-600 underline hover:text-blue-800"
+              className="mt-2 text-blue-600 underline hover:text-blue-800"
             >
               Try Again
             </button>
@@ -145,18 +177,21 @@ export default function TableWidget({
               </tr>
             </thead>
             <tbody>
-              {filteredRows.length > 0 ? (
-                filteredRows.map((row, idx) => (
+              {paginatedRows.length > 0 ? (
+                paginatedRows.map((row, idx) => (
                   <tr
                     key={idx}
                     className="border-b hover:bg-gray-50 transition-colors"
                   >
                     <td className="p-2 font-medium text-gray-600 whitespace-nowrap">
-                      {row.key_name || idx}
+                      {formatValue(
+                        row.key_name || (currentPage - 1) * ROWS_PER_PAGE + idx,
+                        dataFormat,
+                      )}
                     </td>
                     {columns.map((col) => (
                       <td key={col} className="p-2 text-gray-800 font-mono">
-                        {row[col] ? String(row[col]) : "-"}
+                        {formatValue(row[col], dataFormat)}
                       </td>
                     ))}
                   </tr>
@@ -177,6 +212,30 @@ export default function TableWidget({
           </table>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center mt-3 pt-2 border-t border-gray-100">
+          <button
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="p-1 rounded hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent"
+          >
+            <ChevronLeft size={16} className="text-gray-600" />
+          </button>
+
+          <span className="text-xs font-medium text-gray-500">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <button
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="p-1 rounded hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent"
+          >
+            <ChevronRight size={16} className="text-gray-600" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Trash2, RefreshCw, LineChart as ChartIcon } from "lucide-react";
+import { Trash2, RefreshCw, LineChart as ChartIcon , Settings} from "lucide-react";
 import {
   LineChart,
   Line,
@@ -20,6 +20,7 @@ export default function ChartWidget({
   columns = [],
   cachedData,
   onRemove,
+  onEdit
 }) {
   const [data, setData] = useState(cachedData || null);
   const [loading, setLoading] = useState(!cachedData);
@@ -94,7 +95,10 @@ export default function ChartWidget({
             className="p-1.5 text-gray-400 hover:text-blue-600 rounded"
             title="Refresh"
           >
-            <RefreshCw size={14} />
+            <RefreshCw size={14} className={loading ? "animate-spin" : ""}/>
+          </button>
+          <button onClick={onEdit} className="p-1.5 text-gray-400 hover:text-purple-600 rounded" title="Edit">
+            <Settings size={15}/>
           </button>
           <button
             onClick={onRemove}

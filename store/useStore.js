@@ -18,7 +18,13 @@ const useStore = create(
             },
           ],
         })),
-
+      
+      updateWidget: (id, updatedConfig) => set((state) => ({
+        widgets: state.widgets.map((w) => 
+          w.id === id ? { ...w, ...updatedConfig } : w
+        )
+      })),
+      
       removeWidget: (id) =>
         set((state) => ({
           widgets: state.widgets.filter((w) => w.id !== id),

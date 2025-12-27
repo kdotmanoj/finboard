@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Trash2, RefreshCw, TrendingUp } from "lucide-react";
+import { Trash2, RefreshCw, TrendingUp, Settings} from "lucide-react";
 import { formatValue } from "@/utils/formatter";
 
 export default function CardWidget({
@@ -10,7 +10,8 @@ export default function CardWidget({
   cardFields = [],
   cachedData,
   onRemove,
-  dataFormat = 'raw'
+  dataFormat = 'raw',
+  onEdit
 }) {
   const [data, setData] = useState(cachedData || null);
   const [loading, setLoading] = useState(!cachedData);
@@ -65,6 +66,9 @@ export default function CardWidget({
             className="p-1.5 text-gray-400 hover:text-blue-600 rounded"
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+          </button>
+          <button onClick={onEdit} className="p-1.5 text-gray-400 hover:text-purple-600 rounded" title="Edit">
+            <Settings size={15}/>
           </button>
           <button
             onClick={onRemove}
