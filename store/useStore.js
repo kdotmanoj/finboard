@@ -24,7 +24,7 @@ const useStore = create(
           w.id === id ? { ...w, ...updatedConfig } : w
         )
       })),
-      
+
       removeWidget: (id) =>
         set((state) => ({
           widgets: state.widgets.filter((w) => w.id !== id),
@@ -38,6 +38,8 @@ const useStore = create(
             widgets: arrayMove(state.widgets, oldIndex, newIndex),
           };
         }),
+      
+      importWidgets: (newWidgets) => set({ widgets: newWidgets, layout: [] }),
     }),
     {
       name: "finboard-storage",

@@ -10,6 +10,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { formatValue } from "../utils/formatter";
+import { fetchWithCache } from "@/utils/apiCache";
 
 export default function TableWidget({
   id,
@@ -34,8 +35,7 @@ export default function TableWidget({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(apiEndpoint);
-      const json = await res.json();
+      const json = await fetchWithCache(apiEndpoint);
       if (json.Note || json.Information) throw new Error("API Limit Reached");
       setData(json);
     } catch (err) {

@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import { fetchWithCache } from "@/utils/apiCache";
 
 export default function ChartWidget({
   id,
@@ -27,12 +28,10 @@ export default function ChartWidget({
   const [error, setError] = useState(null);
 
   const fetchData = async () => {
-    setLoading(true);
+    if (!data) setLoading(true);
     setError(null);
     try {
-      const res = await fetch(apiEndpoint);
-      if (!res.ok) throw new Error("Fetch failed");
-      const json = await res.json();
+      const json = await fetchWithCache(apiEndpoint);
       setData(json);
     } catch (err) {
       setError("Failed to load chart data");

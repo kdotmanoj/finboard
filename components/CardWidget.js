@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Trash2, RefreshCw, TrendingUp, Settings} from "lucide-react";
 import { formatValue } from "@/utils/formatter";
+import { fetchWithCache } from "@/utils/apiCache";
 
 export default function CardWidget({
   id,
@@ -17,13 +18,12 @@ export default function CardWidget({
   const [loading, setLoading] = useState(!cachedData);
 
   const fetchData = async () => {
-    setLoading(true);
+    if (!data) setLoading(true);
     try {
-      const res = await fetch(apiEndpoint);
-      const json = await res.json();
+      const json = await fetchWithCache(apiEndpoint);
       setData(json);
     } catch (err) {
-      console.error(err);
+      console.error("Fetch failed:",err);
     } finally {
       setLoading(false);
     }

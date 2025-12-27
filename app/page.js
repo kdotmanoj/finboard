@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
+import { Download, Upload } from 'lucide-react';
 import { 
   DndContext, 
   closestCenter, 
@@ -21,7 +22,7 @@ import ChartWidget from '@/components/ChartWidget';
 import { SortableItem } from '@/components/SortableItem';
 
 export default function Dashboard() {
-  const { widgets, removeWidget, reorderWidgets } = useStore(); 
+  const { widgets, removeWidget, reorderWidgets, importWidgets } = useStore(); 
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editId, setEditId] = useState(null); 
@@ -56,6 +57,34 @@ export default function Dashboard() {
     setEditId(null);
   };
 
+  const handleExport = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(widgets));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "finboard-config.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
+  const handleImport = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const importedWidgets = JSON.parse(e.target.result);
+            if (Array.isArray(importedWidgets)) {
+                importWidgets(importedWidgets);
+                alert('Dashboard loaded successfully!');
+            }
+        } catch (error) {
+            alert('Invalid configuration file');
+        }
+    };
+    reader.readAsText(file);
+  };
+
   if(!mounted) return <div className="p-10 text-center text-gray-400">Loading FinBoard...</div>;
 
   return (
@@ -65,12 +94,22 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">My FinBoard</h1>
           <p className="text-gray-500 text-sm mt-1">Real-time Financial Dashboard</p>
         </div>
-        <button 
-          onClick={handleAdd}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition-all flex items-center gap-2"
-        >
-          + Add Widget
-        </button>
+        <div className="flex gap-3">
+          <label className="cursor-pointer bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 px-4 py-2.5 rounded-lg font-medium shadow-sm transition-all flex items-center gap-2">
+              <Upload size={18} />
+              <span className="hidden sm:inline">Import</span>
+              <input type="file" accept=".json" onChange={handleImport} className="hidden" />
+          </label>
+
+          <button onClick={handleExport} className="bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 px-4 py-2.5 rounded-lg font-medium shadow-sm transition-all flex items-center gap-2">
+              <Download size={18} />
+              <span className="hidden sm:inline">Export</span>
+          </button>
+
+          <button onClick={handleAdd} className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm transition-all flex items-center gap-2">
+              + Add Widget
+          </button>
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto">
