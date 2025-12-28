@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Trash2, RefreshCw, LineChart as ChartIcon , Settings} from "lucide-react";
 import {
   LineChart,
@@ -62,7 +62,7 @@ export default function ChartWidget({
     return () => clearInterval(interval);
   }, [apiEndpoint]);
 
-  const getChartData = () => {
+  const chartData = useMemo(() => {
     if (!data || !dataKey) return [];
 
     const parts = dataKey.split("-->");
@@ -75,11 +75,10 @@ export default function ChartWidget({
       }
     }
 
-    let rawData = [];
     if (Array.isArray(current)) {
-      rawData = current.slice(0, 20).reverse();
+      return current.slice(0, 20).reverse();
     } else if (typeof current === "object") {
-      rawData = Object.keys(current)
+      return Object.keys(current)
         .slice(0, 20)
         .map((key) => ({
           name: key,
@@ -87,10 +86,10 @@ export default function ChartWidget({
         }))
         .reverse();
     }
-    return rawData;
-  };
+    return [];
+  }, [data, dataKey]);
 
-  const chartData = getChartData();
+  
   const colors = ["#2563eb", "#db2777", "#16a34a", "#d97706", "#9333ea"];
 
   return (
