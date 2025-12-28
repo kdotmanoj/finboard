@@ -1,6 +1,24 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-neutral-750: #323232;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+body {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.card-widget {
+  transition: all 0.2s ease;
+}
+
+.card-widget:hover {
+  border-color: rgb(59 130 246 / 0.5);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+.dark .card-widget:hover {
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.3);
 }

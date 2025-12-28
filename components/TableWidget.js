@@ -99,34 +99,34 @@ export default function TableWidget({
   );
 
   return (
-    <div className="flex flex-col h-full bg-white p-4 relative group">
+    <div className="flex flex-col h-full bg-white dark:bg-neutral-900 p-4 relative group">
       <div className="flex flex-col gap-3 mb-3">
         <div className="flex justify-between items-center drag-handle cursor-move">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
+            <div className="p-1.5 bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 rounded-lg">
               <TableIcon size={16} />
             </div>
-            <h3 className="font-semibold text-gray-700 truncate" title={title}>
+            <h3 className="font-semibold text-neutral-700 dark:text-neutral-200 truncate" title={title}>
               {title}
             </h3>
           </div>
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={fetchData}
-              className="p-1.5 text-gray-400 hover:text-blue-600 rounded"
+              className="p-1.5 text-neutral-400 dark:text-neutral-500 hover:text-blue-600 dark:hover:text-blue-400 rounded transition-colors"
             >
               <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
             </button>
             <button
               onClick={onEdit}
-              className="p-1.5 text-gray-400 hover:text-green-600 rounded"
+              className="p-1.5 text-neutral-400 dark:text-neutral-500 hover:text-green-600 dark:hover:text-green-400 rounded transition-colors"
               title="Edit"
             >
               <Edit2 size={15} />
             </button>
             <button
               onClick={onRemove}
-              className="p-1.5 text-gray-400 hover:text-red-600 rounded"
+              className="p-1.5 text-neutral-400 dark:text-neutral-500 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors"
             >
               <Trash2 size={14} />
             </button>
@@ -134,42 +134,42 @@ export default function TableWidget({
         </div>
 
         <div className="relative">
-          <Search size={14} className="absolute left-2.5 top-2 text-gray-400" />
+          <Search size={14} className="absolute left-2.5 top-2 text-neutral-400 dark:text-neutral-500" />
           <input
             type="text"
             placeholder="Search table..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-200 rounded-md focus:border-purple-500 outline-none bg-gray-50 focus:bg-white transition-colors"
+            className="w-full pl-8 pr-3 py-1.5 text-xs border border-neutral-200 dark:border-neutral-700 rounded-md focus:border-purple-500 dark:focus:border-purple-400 outline-none bg-neutral-50 dark:bg-neutral-800 focus:bg-white dark:focus:bg-neutral-750 transition-colors text-neutral-900 dark:text-neutral-100"
           />
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto border rounded-lg scrollbar-thin">
+      <div className="flex-1 overflow-auto border border-neutral-200 dark:border-neutral-700 rounded-lg scrollbar-thin">
         {error ? (
-          <div className="h-full flex flex-col items-center justify-center text-red-500 text-xs p-4 text-center bg-red-50 rounded">
+          <div className="h-full flex flex-col items-center justify-center text-red-500 dark:text-red-400 text-xs p-4 text-center bg-red-50 dark:bg-red-950 rounded">
             <p className="font-bold mb-1">API Error</p>
             <p>{error}</p>
             <button
               onClick={fetchData}
-              className="mt-2 text-blue-600 underline hover:text-blue-800"
+              className="mt-2 text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
             >
               Try Again
             </button>
           </div>
         ) : loading && !data ? (
-          <div className="p-4 text-center text-gray-400 text-sm animate-pulse">
+          <div className="p-4 text-center text-neutral-400 dark:text-neutral-500 text-sm animate-pulse">
             Loading data...
           </div>
         ) : (
           <table className="w-full text-xs text-left">
-            <thead className="bg-gray-50 text-gray-500 font-medium sticky top-0">
+            <thead className="bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 font-medium sticky top-0">
               <tr>
-                <th className="p-2 border-b">Date/Key</th>
+                <th className="p-2 border-b border-neutral-200 dark:border-neutral-700">Date/Key</th>
                 {columns.map((col) => (
                   <th
                     key={col}
-                    className="p-2 border-b font-mono text-purple-700"
+                    className="p-2 border-b border-neutral-200 dark:border-neutral-700 font-mono text-purple-700 dark:text-purple-400"
                   >
                     {col}
                   </th>
@@ -181,16 +181,16 @@ export default function TableWidget({
                 paginatedRows.map((row, idx) => (
                   <tr
                     key={idx}
-                    className="border-b hover:bg-gray-50 transition-colors"
+                    className="border-b border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
                   >
-                    <td className="p-2 font-medium text-gray-600 whitespace-nowrap">
+                    <td className="p-2 font-medium text-neutral-600 dark:text-neutral-300 whitespace-nowrap">
                       {formatValue(
                         row.key_name || (currentPage - 1) * ROWS_PER_PAGE + idx,
                         dataFormat,
                       )}
                     </td>
                     {columns.map((col) => (
-                      <td key={col} className="p-2 text-gray-800 font-mono">
+                      <td key={col} className="p-2 text-neutral-800 dark:text-neutral-200 font-mono">
                         {formatValue(row[col], dataFormat)}
                       </td>
                     ))}
@@ -200,7 +200,7 @@ export default function TableWidget({
                 <tr>
                   <td
                     colSpan={columns.length + 1}
-                    className="p-4 text-center text-gray-400"
+                    className="p-4 text-center text-neutral-400 dark:text-neutral-500"
                   >
                     {rows.length === 0
                       ? "No Data Found"
@@ -214,25 +214,25 @@ export default function TableWidget({
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-between items-center mt-3 pt-2 border-t border-gray-100">
+        <div className="flex justify-between items-center mt-3 pt-2 border-t border-neutral-100 dark:border-neutral-800">
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="p-1 rounded hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent"
+            className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
           >
-            <ChevronLeft size={16} className="text-gray-600" />
+            <ChevronLeft size={16} className="text-neutral-600 dark:text-neutral-400" />
           </button>
 
-          <span className="text-xs font-medium text-gray-500">
+          <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
             Page {currentPage} of {totalPages}
           </span>
 
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="p-1 rounded hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent"
+            className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
           >
-            <ChevronRight size={16} className="text-gray-600" />
+            <ChevronRight size={16} className="text-neutral-600 dark:text-neutral-400" />
           </button>
         </div>
       )}

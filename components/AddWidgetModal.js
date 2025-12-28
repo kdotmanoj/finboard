@@ -128,7 +128,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
 
   const renderJsonTree = (data, prefix = "") => {
     if (data === null)
-      return <span className="text-gray-400 italic">null</span>;
+      return <span className="text-neutral-400 dark:text-neutral-500 italic">null</span>;
 
     const isObject = typeof data === "object";
     const isArray = Array.isArray(data);
@@ -163,7 +163,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
                     ${
                       isSelectedContainer
                         ? "bg-blue-600 text-white border-blue-700 shadow-sm"
-                        : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600"
+                        : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 border-neutral-300 dark:border-neutral-600 hover:bg-blue-50 dark:hover:bg-blue-950 hover:border-blue-300 dark:hover:border-blue-700 hover:text-blue-600 dark:hover:text-blue-400"
                     }`}
             >
               {isSelectedContainer && <Check size={10} />}
@@ -179,14 +179,14 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
 
           {prefix && (
             <span
-              className={`font-mono text-xs font-bold ${displayType !== "card" && isValidList ? "text-purple-700" : "text-gray-400"}`}
+              className={`font-mono text-xs font-bold ${displayType !== "card" && isValidList ? "text-purple-700 dark:text-purple-400" : "text-neutral-400 dark:text-neutral-500"}`}
             >
               {prefix.split("-->").pop()}:
             </span>
           )}
 
           {isArray && (
-            <span className="text-[10px] text-gray-400 bg-gray-50 px-1 rounded border">
+            <span className="text-[10px] text-neutral-400 dark:text-neutral-500 bg-neutral-50 dark:bg-neutral-800 px-1 rounded border border-neutral-200 dark:border-neutral-700">
               {data.length} items
             </span>
           )}
@@ -200,7 +200,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
             <div>
               {renderJsonTree(data[0], `${prefix}${prefix ? "-->" : ""}0`)}
               {data.length > 1 && (
-                <div className="text-[10px] text-gray-400 italic mt-1 ml-2">
+                <div className="text-[10px] text-neutral-400 dark:text-neutral-500 italic mt-1 ml-2">
                   ... and {data.length - 1} more
                 </div>
               )}
@@ -208,7 +208,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
           );
         } else {
           childrenContent = (
-            <div className="text-gray-400 italic text-xs ml-2">(Empty)</div>
+            <div className="text-neutral-400 dark:text-neutral-500 italic text-xs ml-2">(Empty)</div>
           );
         }
       } else {
@@ -221,7 +221,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
 
       return (
         <div
-          className={`pl-2 ml-1 ${prefix !== "" ? "border-l-2 border-gray-100" : ""}`}
+          className={`pl-2 ml-1 ${prefix !== "" ? "border-l-2 border-neutral-100 dark:border-neutral-800" : ""}`}
         >
           {containerHeader}
           <div className="pl-2">{childrenContent}</div>
@@ -239,8 +239,8 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
           className={`ml-2 my-0.5 px-2 py-0.5 text-xs rounded border transition-colors inline-flex items-center gap-1
                     ${
                       isSelected
-                        ? "bg-green-100 text-green-700 border-green-200 cursor-default"
-                        : "bg-white text-gray-700 border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300"
+                        ? "bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800 cursor-default"
+                        : "bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-200 border-neutral-200 dark:border-neutral-700 hover:bg-green-50 dark:hover:bg-green-950 hover:text-green-600 dark:hover:text-green-400 hover:border-green-300 dark:hover:border-green-700"
                     }`}
         >
           {isSelected && <Check size={10} />} {String(data)}
@@ -248,7 +248,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
       );
     }
     return (
-      <span className="ml-2 text-gray-400 text-xs select-none">
+      <span className="ml-2 text-neutral-400 dark:text-neutral-500 text-xs select-none">
         {String(data)}
       </span>
     );
@@ -278,28 +278,28 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
-        <div className="p-4 border-b flex justify-between items-center bg-gray-50">
-          <h2 className="font-bold text-lg text-gray-800">
+      <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-neutral-200 dark:border-neutral-700">
+        <div className="p-4 border-b border-neutral-200 dark:border-neutral-700 flex justify-between items-center bg-neutral-50 dark:bg-neutral-800">
+          <h2 className="font-bold text-lg text-neutral-800 dark:text-neutral-100">
             {editWidgetId ? "Edit Widget" : "Configure New Widget"}
           </h2>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-200 rounded-full"
+            className="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-full transition-colors"
           >
-            <X size={20} className="text-gray-500" />
+            <X size={20} className="text-neutral-500 dark:text-neutral-400" />
           </button>
         </div>
 
         <div className="p-6 overflow-y-auto flex-1">
-          <div className="flex bg-gray-100 p-1 rounded-lg w-fit mb-6">
+          <div className="flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-lg w-fit mb-6">
             {["card", "table", "chart"].map((type) => (
               <button
                 key={type}
                 onClick={() => {
                   setDisplayType(type);
                 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium capitalize transition-all ${displayType === type ? "bg-white text-blue-600 shadow-sm" : "text-gray-500"}`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium capitalize transition-all ${displayType === type ? "bg-white dark:bg-neutral-700 text-blue-600 dark:text-blue-400 shadow-sm" : "text-neutral-500 dark:text-neutral-400"}`}
               >
                 {type === "card" && <CreditCard size={16} />}
                 {type === "table" && <List size={16} />}
@@ -315,14 +315,14 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Widget Title"
-              className="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-2 border border-neutral-300 dark:border-neutral-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
             />
             <div className="flex gap-2">
                 {displayType === 'card' && (
                     <select 
                         value={dataFormat} 
                         onChange={(e) => setDataFormat(e.target.value)}
-                        className="p-2 border rounded-lg bg-white text-sm outline-none focus:ring-2 focus:ring-blue-500 text-gray-600"
+                        className="p-2 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-sm outline-none focus:ring-2 focus:ring-blue-500 text-neutral-600 dark:text-neutral-300"
                     >
                         <option value="raw">No Format</option>
                         <option value="currency">Currency ($)</option>
@@ -337,12 +337,12 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
                 value={apiEndpoint}
                 onChange={(e) => setApiEndpoint(e.target.value)}
                 placeholder="API URL"
-                className="w-full p-2 border rounded-lg font-mono text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-2 border border-neutral-300 dark:border-neutral-700 rounded-lg font-mono text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
               />
               <button
                 onClick={handleTest}
                 disabled={loading}
-                className="bg-blue-600 text-white px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="bg-blue-600 text-white px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
               >
                 Test
               </button>
@@ -351,26 +351,26 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
           </div>
 
           {previewData && (
-            <div className="border rounded-lg overflow-hidden flex flex-col max-h-125">
-              <div className="bg-gray-50 p-2 border-b text-xs font-bold text-gray-500 uppercase">
+            <div className="border border-neutral-200 dark:border-neutral-700 rounded-lg overflow-hidden flex flex-col max-h-125">
+              <div className="bg-neutral-50 dark:bg-neutral-800 p-2 border-b border-neutral-200 dark:border-neutral-700 text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase">
                 {displayType === "card"
                   ? "Click values to add them"
                   : "Select a Data List"}
               </div>
               <div
-                className="p-4 bg-white overflow-auto flex-1 font-mono text-sm border-b"
+                className="p-4 bg-white dark:bg-neutral-900 overflow-auto flex-1 font-mono text-sm border-b border-neutral-200 dark:border-neutral-700"
                 style={{ minHeight: "200px" }}
               >
                 {renderJsonTree(previewData)}
               </div>
 
               {displayType === "card" && (
-                <div className="p-4 bg-green-50">
-                  <label className="block text-xs font-bold text-green-800 uppercase mb-2">
+                <div className="p-4 bg-green-50 dark:bg-green-950">
+                  <label className="block text-xs font-bold text-green-800 dark:text-green-400 uppercase mb-2">
                     Selected Metrics ({cardFields.length})
                   </label>
                   {cardFields.length === 0 ? (
-                    <div className="text-xs text-green-600 italic">
+                    <div className="text-xs text-green-600 dark:text-green-400 italic">
                       Click green values above to add them here.
                     </div>
                   ) : (
@@ -378,7 +378,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
                       {cardFields.map((field, idx) => (
                         <div
                           key={idx}
-                          className="flex gap-2 items-center bg-white p-1 rounded border border-green-200"
+                          className="flex gap-2 items-center bg-white dark:bg-neutral-800 p-1 rounded border border-green-200 dark:border-green-800"
                         >
                           <input
                             type="text"
@@ -386,11 +386,11 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
                             onChange={(e) =>
                               updateCardLabel(idx, e.target.value)
                             }
-                            className="flex-1 text-xs p-1 outline-none font-medium text-gray-700"
+                            className="flex-1 text-xs p-1 outline-none font-medium text-neutral-700 dark:text-neutral-200 bg-transparent"
                           />
                           <button
                             onClick={() => removeCardField(idx)}
-                            className="text-red-400 hover:text-red-600 p-1"
+                            className="text-red-400 hover:text-red-600 dark:text-red-500 dark:hover:text-red-400 p-1 transition-colors"
                           >
                             <Trash2 size={12} />
                           </button>
@@ -403,9 +403,9 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
 
               {(displayType === "table" || displayType === "chart") &&
                 selectedPath !== null && (
-                  <div className="p-4 bg-blue-50">
+                  <div className="p-4 bg-blue-50 dark:bg-blue-950">
                     <div className="flex justify-between items-end mb-2">
-                      <label className="block text-xs font-bold text-blue-800 uppercase">
+                      <label className="block text-xs font-bold text-blue-800 dark:text-blue-400 uppercase">
                         Select Fields
                       </label>
                       <input
@@ -413,7 +413,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
                         placeholder="Search..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="text-xs p-1 px-2 border rounded w-32"
+                        className="text-xs p-1 px-2 border border-neutral-300 dark:border-neutral-700 rounded w-32 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
                       />
                     </div>
                     <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto pr-1">
@@ -421,7 +421,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
                         <button
                           key={col}
                           onClick={() => toggleColumn(col)}
-                          className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${selectedColumns.includes(col) ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-600"}`}
+                          className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${selectedColumns.includes(col) ? "bg-blue-600 text-white border-blue-600" : "bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 border-neutral-300 dark:border-neutral-700"}`}
                         >
                           {col}
                         </button>
@@ -432,8 +432,8 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
             </div>
           )}
         </div>
-        <div className="p-4 border-t bg-gray-50 flex justify-end gap-3">
-          <button onClick={onClose} className="px-4 py-2 text-gray-600">
+        <div className="p-4 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 flex justify-end gap-3">
+          <button onClick={onClose} className="px-4 py-2 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-lg transition-colors">
             Cancel
           </button>
           <button
@@ -444,7 +444,7 @@ export default function AddWidgetModal({ isOpen, onClose, editWidgetId = null })
                 ? cardFields.length === 0
                 : !selectedPath && selectedPath !== "" || selectedColumns.length === 0)
             }
-            className="bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50"
+            className="bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 transition-colors"
           >
             {editWidgetId ? "Save Changes" : "Add Widget"}
           </button>
