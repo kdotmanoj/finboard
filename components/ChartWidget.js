@@ -111,7 +111,7 @@ export default function ChartWidget({
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""}/>
           </button>
-          <button onClick={onEdit} className="p-1.5 text-neutral-400 dark:text-neutral-500 hover:text-purple-600 dark:hover:text-purple-400 rounded transition-colors" title="Edit">
+          <button onClick={onEdit} className="p-1.5 text-neutral-400 dark:text-neutral-500 hover:text-purple-600 dark:hover:text-green-400 rounded transition-colors" title="Edit">
             <Settings size={15}/>
           </button>
           <button

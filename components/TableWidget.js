@@ -5,7 +5,7 @@ import {
   RefreshCw,
   Table as TableIcon,
   Search,
-  Edit2,
+  Settings,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -119,10 +119,10 @@ export default function TableWidget({
             </button>
             <button
               onClick={onEdit}
-              className="p-1.5 text-neutral-400 dark:text-neutral-500 hover:text-green-600 dark:hover:text-green-400 rounded transition-colors"
+              className="p-1.5 text-neutral-400 dark:text-neutral-500 hover:text-purple-600 dark:hover:text-green-400 rounded transition-colors"
               title="Edit"
             >
-              <Edit2 size={15} />
+              <Settings size={15} />
             </button>
             <button
               onClick={onRemove}
